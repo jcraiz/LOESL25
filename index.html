@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambridge Primary English - Learning Objectives Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: #212529;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        }
+        header h1 {
+            color: #00539f; /* Cambridge Blue */
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        header p {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 25px;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #eef3f8;
+            border-radius: 6px;
+            align-items: flex-end; /* Aligns items to the bottom */
+        }
+        .control-group {
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+        }
+        .control-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #343a40;
+            font-size: 0.9em;
+        }
+        .control-group select, .control-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1em;
+            background-color: #fff;
+            font-family: 'Montserrat', sans-serif;
+        }
+        #clear-button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #6c757d;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        #clear-button:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+        
+        #results-container {
+            margin-top: 20px;
+        }
+        #initial-prompt,
+        #no-results {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 20px;
+            color: #6c757d;
+            font-style: italic;
+            background-color: #f8f9fa;
+            border: 1px dashed #ced4da;
+            border-radius: 6px;
+        }
+        .objective-group {
+            margin-bottom: 25px;
+            border-left: 3px solid #007bff;
+            padding-left: 15px;
+        }
+        .objective-group h2 {
+            font-size: 1.2em;
+            color: #343a40;
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 5px;
+            font-weight: 600;
+        }
+        .objective-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .objective-list li {
+            padding: 8px 0;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        .objective-list li:last-child {
+            border-bottom: none;
+        }
+        .objective-code {
+            font-weight: 700;
+            color: #007bff;
+            background-color: #e7f5ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .objective-description {
+            color: #495057;
+        }
+        .code-table-details {
+            margin-top: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .code-table-details summary {
+            padding: 10px;
+            font-weight: bold;
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+        .code-table-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .code-table-details th, .code-table-details td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+         .code-table-details th {
+            background-color: #f8f9fa;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Cambridge Primary English (0057) Learning Objectives Explorer</h1>
+            <p>Filter by Stage, Strand, or search by keyword to find specific learning objectives.</p>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="stage-filter">Filter by Stage</label>
+                <select id="stage-filter">
+                    <option value="all">All Stages</option>
+                    <option value="1">Stage 1</option>
+                    <option value="2">Stage 2</option>
+                    <option value="3">Stage 3</option>
+                    <option value="4">Stage 4</option>
+                    <option value="5">Stage 5</option>
+                    <option value="6">Stage 6</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="strand-filter">Filter by Strand</label>
+                <select id="strand-filter">
+                    <option value="all">All Strands</option>
+                    <option value="Listening">Listening</option>
+                    <option value="Speaking">Speaking</option>
+                    <option value="Writing">Writing</option>
+                    <option value="Reading">Reading</option>
+                    <option value="Use of English">Use of English</option>
+                </select>
+            </div>
+            <div class="control-group" style="flex-grow: 1.5;">
+                <label for="search-box">Search by Code or Keyword</label>
+                <input type="text" id="search-box" placeholder="e.g., '4Wca.03' or 'punctuation'">
+            </div>
+            <div class="control-group" style="flex: 0.5; min-width: 120px;">
+                <button id="clear-button">Clear</button>
+            </div>
+        </div>
+
+        <div id="results-container">
+            <!-- Objectives will be dynamically inserted here -->
+        </div>
+
+        <details class="code-table-details">
+            <summary>Objective Code Reference</summary>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strand</th>
+                        <th>Sub-strand</th>
+                        <th>Código</th>
+                        <th>Significado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Listening</td><td>Listening for global meaning</td><td>Lm</td><td>Comprensión global auditiva</td></tr>
+                    <tr><td>Listening</td><td>Listening for detail</td><td>Ld</td><td>Comprensión de detalles auditivos</td></tr>
+                    <tr><td>Listening</td><td>Listening for opinion</td><td>Lo</td><td>Comprensión de opiniones auditivas</td></tr>
+                    <tr><td>Speaking</td><td>Communication</td><td>Sc</td><td>Comunicación oral</td></tr>
+                    <tr><td>Speaking</td><td>Express opinion</td><td>So</td><td>Expresión de opiniones</td></tr>
+                    <tr><td>Speaking</td><td>Organisation</td><td>Sor</td><td>Organización del discurso</td></tr>
+                    <tr><td>Writing</td><td>Communicative achievement</td><td>Wca</td><td>Logro comunicativo escrito</td></tr>
+                    <tr><td>Writing</td><td>Organisation</td><td>Wor</td><td>Organización textual</td></tr>
+                    <tr><td>Writing</td><td>Content</td><td>Wc</td><td>Contenido escrito</td></tr>
+                    <tr><td>Reading</td><td>Reading for global meaning</td><td>Rm</td><td>Comprensión global lectora</td></tr>
+                    <tr><td>Reading</td><td>Reading for detail</td><td>Rd</td><td>Comprensión de detalles lectores</td></tr>
+                    <tr><td>Reading</td><td>Reading for opinion</td><td>Ro</td><td>Comprensión de opiniones lectoras</td></tr>
+                    <tr><td>Use of English</td><td>Grammatical forms</td><td>Ug</td><td>Formas gramaticales</td></tr>
+                    <tr><td>Use of English</td><td>Vocabulary</td><td>Uv</td><td>Vocabulario</td></tr>
+                    <tr><td>Use of English</td><td>Sentence structure</td><td>Us</td><td>Estructura oracional</td></tr>
+                </tbody>
+            </table>
+        </details>
+        
+        <footer>
+            <p>This tool is an idea by Juan Carlos Arcila in 2025</p>
+        </footer>
+    </div>
+
+    <script>
+    // --- DATABASE of Learning Objectives ---
+    const objectives = [
+        // Stage 1
+        { stage: 1, strand: "Listening", subStrand: "Listening for global meaning", code: "1Lm.01", description: "Understand, with support, the main point of short talk." },
+        { stage: 1, strand: "Listening", subStrand: "Listening for detail", code: "1Ld.01", description: "Recognise a limited range of simple words that are spelled out slowly and clearly." },
+        { stage: 1, strand: "Listening", subStrand: "Listening for detail", code: "1Ld.02", description: "Understand, with support, a limited range of short, simple instructions." },
+        { stage: 1, strand: "Listening", subStrand: "Listening for detail", code: "1Ld.03", description: "Understand, with support, a limited range of short, simple questions which ask for simple information." },
+        { stage: 1, strand: "Listening", subStrand: "Listening for detail", code: "1Ld.04", description: "Deduce meaning from context, with support, of a limited range of simple words." },
+        { stage: 1, strand: "Listening", subStrand: "Listening for detail", code: "1Ld.05", description: "Understand, with support, some specific information and detail of short talk." },
+        { stage: 1, strand: "Speaking", subStrand: "Communication", code: "1Sc.01", description: "Give basic information about themselves using simple words and phrases." },
+        { stage: 1, strand: "Speaking", subStrand: "Communication", code: "1Sc.02", description: "Describe people, places and objects, and routine actions and events, using simple words and phrases." },
+        { stage: 1, strand: "Speaking", subStrand: "Communication", code: "1Sc.03", description: "Ask simple questions about classroom routines and to find out a limited range of personal information and respond accordingly." },
+        { stage: 1, strand: "Speaking", subStrand: "Communication", code: "1Sc.04", description: "Reproduce correctly a limited range of sounds in simple, familiar words and phrases." },
+        { stage: 1, strand: "Speaking", subStrand: "Communication", code: "1Sc.05", description: "Produce short, isolated, rehearsed phrases using gesture and signalled requests for help when necessary." },
+        { stage: 1, strand: "Speaking", subStrand: "Communication", code: "1Sc.06", description: "Use a limited range of simple grammatical structures, allowing for frequent, basic mistakes." },
+        { stage: 1, strand: "Speaking", subStrand: "Organisation", code: "1Sor.01", description: "Link, with support, words and phrases using basic connectives." },
+        { stage: 1, strand: "Speaking", subStrand: "Organisation", code: "1Sor.02", description: "Take turns when speaking with others in a limited range of short, basic exchanges." },
+        { stage: 1, strand: "Writing", subStrand: "Communicative achievement", code: "1Wca.01", description: "Write letters and words in a straight line from left to right." },
+        { stage: 1, strand: "Writing", subStrand: "Communicative achievement", code: "1Wca.02", description: "Form upper and lower case letters." },
+        { stage: 1, strand: "Writing", subStrand: "Communicative achievement", code: "1Wca.03", description: "Spell some simple, high-frequency words accurately during guided writing activities." },
+        { stage: 1, strand: "Writing", subStrand: "Communicative achievement", code: "1Wca.04", description: "Write familiar words." },
+        { stage: 1, strand: "Writing", subStrand: "Communicative achievement", code: "1Wca.05", description: "Begin to use a limited range of simple grammatical structures, allowing for frequent, basic mistakes." },
+        { stage: 1, strand: "Writing", subStrand: "Content", code: "1Wc.01", description: "Write, with support, words and short, simple phrases to give personal and factual information." },
+        { stage: 1, strand: "Reading", subStrand: "Reading for detail", code: "1Rd.01", description: "Recognise, identify, sound and name the letters of the alphabet." },
+        { stage: 1, strand: "Reading", subStrand: "Reading for detail", code: "1Rd.02", description: "Recognise, identify and blend sounds in individual words." },
+        { stage: 1, strand: "Reading", subStrand: "Reading for detail", code: "1Rd.03", description: "Understand, with support, simple words and phrases in short, simple, illustrated texts." },
+        { stage: 1, strand: "Reading", subStrand: "Reading for detail", code: "1Rd.04", description: "Begin to deduce the meaning of a limited range of simple, familiar words, with support, by linking them to pictures." },
+        { stage: 1, strand: "Use of English", subStrand: "Grammatical forms", code: "1Ug.01", description: "Use familiar question words and structures." },
+        { stage: 1, strand: "Use of English", subStrand: "Grammatical forms", code: "1Ug.02", description: "Use common present simple forms to give basic personal and factual information." },
+        { stage: 1, strand: "Use of English", subStrand: "Grammatical forms", code: "1Ug.03", description: "Use common present continuous forms [positive, negative, question] to talk about present activities." },
+        { stage: 1, strand: "Use of English", subStrand: "Grammatical forms", code: "1Ug.04", description: "Use can/can't to describe ability." },
+        { stage: 1, strand: "Use of English", subStrand: "Grammatical forms", code: "1Ug.05", description: "Use common adjectives, including colours, to say what someone/something is or has." },
+        { stage: 1, strand: "Use of English", subStrand: "Grammatical forms", code: "1Ug.06", description: "Use possessive adjectives to describe objects." },
+        { stage: 1, strand: "Use of English", subStrand: "Vocabulary", code: "1Uv.01", description: "Use cardinal numbers 1-20." },
+        { stage: 1, strand: "Use of English", subStrand: "Vocabulary", code: "1Uv.02", description: "Use ordinal numbers 1st-10th." },
+        { stage: 1, strand: "Use of English", subStrand: "Vocabulary", code: "1Uv.03", description: "Use with to indicate accompaniment and for to indicate recipient." },
+        { stage: 1, strand: "Use of English", subStrand: "Vocabulary", code: "1Uv.04", description: "Use basic prepositions of location and position (e.g. at, in, near, next to, on) to describe where people and things are." },
+        { stage: 1, strand: "Use of English", subStrand: "Vocabulary", code: "1Uv.05", description: "Use prepositions of time (e.g. on, in) to talk about days and time." },
+        { stage: 1, strand: "Use of English", subStrand: "Vocabulary", code: "1Uv.06", description: "Use common adverbs of place (e.g. here, there) to indicate where things are." },
+        { stage: 1, strand: "Use of English", subStrand: "Vocabulary", code: "1Uv.07", description: "Use common singular nouns, plural nouns [plural 's'] and proper nouns to say what things are." },
+        { stage: 1, strand: "Use of English", subStrand: "Sentence structure", code: "1Us.01", description: "Use articles a, the to refer to familiar objects." },
+        { stage: 1, strand: "Use of English", subStrand: "Sentence structure", code: "1Us.02", description: "Use demonstrative pronouns this, these to indicate things." },
+        { stage: 1, strand: "Use of English", subStrand: "Sentence structure", code: "1Us.03", description: "Use common personal subject and object pronouns to give simple personal information." },
+        { stage: 1, strand: "Use of English", subStrand: "Sentence structure", code: "1Us.04", description: "Use connective and to link words and phrases." },
+        { stage: 1, strand: "Use of English", subStrand: "Sentence structure", code: "1Us.05", description: "Use like + verb + ing to express likes and dislikes." },
+        // Stage 2
+        { stage: 2, strand: "Listening", subStrand: "Listening for global meaning", code: "2Lm.01", description: "Understand, with little or no support, the main point of short talk." },
+        { stage: 2, strand: "Listening", subStrand: "Listening for detail", code: "2Ld.01", description: "Understand, with little or no support, a short sequence of familiar instructions." },
+        { stage: 2, strand: "Listening", subStrand: "Listening for detail", code: "2Ld.02", description: "Understand, with support, a limited range of short questions which ask for simple information." },
+        { stage: 2, strand: "Listening", subStrand: "Listening for detail", code: "2Ld.03", description: "Deduce meaning from context, with support, of an increasing range of simple words." },
+        { stage: 2, strand: "Listening", subStrand: "Listening for detail", code: "2Ld.04", description: "Understand, with little or no support, some specific information and detail of short talk." },
+        { stage: 2, strand: "Speaking", subStrand: "Communication", code: "2Sc.01", description: "Give basic information about themselves using phrases and short sentences." },
+        { stage: 2, strand: "Speaking", subStrand: "Communication", code: "2Sc.02", description: "Describe people, places and objects, and routine actions and events, using phrases and short sentences." },
+        { stage: 2, strand: "Speaking", subStrand: "Communication", code: "2Sc.03", description: "Ask questions to find out an increasing range of personal information and respond accordingly." },
+        { stage: 2, strand: "Speaking", subStrand: "Communication", code: "2Sc.04", description: "Pronounce familiar words and phrases so that these can be understood by others with some effort." },
+        { stage: 2, strand: "Speaking", subStrand: "Communication", code: "2Sc.05", description: "Produce simple phrases, pausing to search for expressions and to repair communication." },
+        { stage: 2, strand: "Speaking", subStrand: "Communication", code: "2Sc.06", description: "Use some simple grammatical structures, allowing for frequent, basic mistakes." },
+        { stage: 2, strand: "Speaking", subStrand: "Express opinion", code: "2So.01", description: "Express, with support, basic feelings." },
+        { stage: 2, strand: "Speaking", subStrand: "Organisation", code: "2Sor.01", description: "Link, with little or no support, words and phrases using basic connectives." },
+        { stage: 2, strand: "Speaking", subStrand: "Organisation", code: "2Sor.02", description: "Take turns when speaking with others in an increasing range of short, basic exchanges." },
+        { stage: 2, strand: "Writing", subStrand: "Communicative achievement", code: "2Wca.01", description: "Write letters and words of consistent size and spacing." },
+        { stage: 2, strand: "Writing", subStrand: "Communicative achievement", code: "2Wca.02", description: "Use upper and lower case letters accurately when writing names, places and short sentences during guided writing activities." },
+        { stage: 2, strand: "Writing", subStrand: "Communicative achievement", code: "2Wca.03", description: "Spell an increasing number of simple, high-frequency words accurately during guided writing activities." },
+        { stage: 2, strand: "Writing", subStrand: "Communicative achievement", code: "2Wca.04", description: "Plan and write phrases and short sentences, with support." },
+        { stage: 2, strand: "Writing", subStrand: "Communicative achievement", code: "2Wca.05", description: "Use some simple grammatical structures, allowing for frequent, basic mistakes." },
+        { stage: 2, strand: "Writing", subStrand: "Organisation", code: "2Wor.01", description: "Use basic punctuation (e.g. full stop and question mark) during guided writing of short sentences and questions." },
+        { stage: 2, strand: "Writing", subStrand: "Organisation", code: "2Wor.02", description: "Link, with support, words, phrases and short sentences using basic connectives." },
+        { stage: 2, strand: "Writing", subStrand: "Content", code: "2Wc.01", description: "Write, with support, simple phrases to give personal and factual information." },
+        { stage: 2, strand: "Writing", subStrand: "Content", code: "2Wc.02", description: "Express, with support, basic feelings." },
+        { stage: 2, strand: "Reading", subStrand: "Reading for global meaning", code: "2Rm.01", description: "Understand, with support, the main point of short, simple texts." },
+        { stage: 2, strand: "Reading", subStrand: "Reading for global meaning", code: "2Rm.02", description: "Begin to read, with support, short, simple fiction and non-fiction texts with confidence and enjoyment." },
+        { stage: 2, strand: "Reading", subStrand: "Reading for detail", code: "2Rd.01", description: "Recognise, identify and sound, with support, a limited range of words and phrases in short, simple texts." },
+        { stage: 2, strand: "Reading", subStrand: "Reading for detail", code: "2Rd.02", description: "Understand, with support, some specific information and detail in short, simple, illustrated texts." },
+        { stage: 2, strand: "Reading", subStrand: "Reading for detail", code: "2Rd.03", description: "Read and follow, with support, a limited range of short, familiar instructions." },
+        { stage: 2, strand: "Reading", subStrand: "Reading for detail", code: "2Rd.04", description: "Deduce the meaning of an increasing range of simple, familiar words, with support, by linking them to pictures." },
+        { stage: 2, strand: "Use of English", subStrand: "Grammatical forms", code: "2Ug.01", description: "Use question words and structures to ask basic questions." },
+        { stage: 2, strand: "Use of English", subStrand: "Grammatical forms", code: "2Ug.02", description: "Use common present simple forms, including short answer forms and contractions, to give personal and factual information." },
+        { stage: 2, strand: "Use of English", subStrand: "Grammatical forms", code: "2Ug.03", description: "Use common past simple forms [regular and irregular] to describe actions and narrate simple events, including short answer forms and contractions." },
+        { stage: 2, strand: "Use of English", subStrand: "Grammatical forms", code: "2Ug.04", description: "Use common present continuous forms, including short answers and contractions, to talk about present activities." },
+        { stage: 2, strand: "Use of English", subStrand: "Grammatical forms", code: "2Ug.05", description: "Use future simple form will to talk about future intention." },
+        { stage: 2, strand: "Use of English", subStrand: "Grammatical forms", code: "2Ug.06", description: "Use can to make requests and ask permission and use appropriate responses (e.g. here you are, OK)." },
+        { stage: 2, strand: "Use of English", subStrand: "Grammatical forms", code: "2Ug.07", description: "Use common adjectives on personal and familiar topics to give personal information and describe things." },
+        { stage: 2, strand: "Use of English", subStrand: "Grammatical forms", code: "2Ug.08", description: "Use possessive adjectives to give personal information and describe familiar things." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.01", description: "Use cardinal numbers 1–100." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.02", description: "Use ordinal numbers 1st–50th." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.03", description: "Use with to indicate accompaniment and instrument and for to indicate recipient." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.04", description: "Use prepositions of location, position and direction (e.g. behind, between, in, in front of, to)." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.05", description: "Use prepositions of time (e.g. at) to talk about days and time." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.06", description: "Use adverbs of definite time (e.g. now, today, yesterday, last week)." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.07", description: "Use common -ly adverbs to describe actions." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.08", description: "Use the adverb too to add information." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.09", description: "Use countable and some common uncountable nouns, including some common irregular plural forms, and possessive 's to name and label things." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.10", description: "Use there is/are to make short statements and descriptions." },
+        { stage: 2, strand: "Use of English", subStrand: "Vocabulary", code: "2Uv.11", description: "Use impersonal you in questions (e.g. How do you spell that?)." },
+        { stage: 2, strand: "Use of English", subStrand: "Sentence structure", code: "2Us.01", description: "Use demonstratives this, that, these, those to refer to familiar objects." },
+        { stage: 2, strand: "Use of English", subStrand: "Sentence structure", code: "2Us.02", description: "Use demonstrative pronouns this, these, that, those and object pronoun one in short statements and responses." },
+        { stage: 2, strand: "Use of English", subStrand: "Sentence structure", code: "2Us.03", description: "Use common personal subject and object pronouns, including possessive pronouns (e.g. mine, yours), to give simple personal information and describe things." },
+        { stage: 2, strand: "Use of English", subStrand: "Sentence structure", code: "2Us.04", description: "Use connectives (e.g. but, or, then) to link words and phrases." },
+        // Stage 3
+        { stage: 3, strand: "Listening", subStrand: "Listening for global meaning", code: "3Lm.01", description: "Understand, with support, some of the main points of short talk." },
+        { stage: 3, strand: "Listening", subStrand: "Listening for detail", code: "3Ld.01", description: "Understand a limited range of familiar instructions." },
+        { stage: 3, strand: "Listening", subStrand: "Listening for detail", code: "3Ld.02", description: "Understand, with little or no support, a limited range of questions which ask for information." },
+        { stage: 3, strand: "Listening", subStrand: "Listening for detail", code: "3Ld.03", description: "Deduce meaning from context, with support, in short talk." },
+        { stage: 3, strand: "Listening", subStrand: "Listening for detail", code: "3Ld.04", description: "Understand, with support, most specific information and detail of short talk." },
+        { stage: 3, strand: "Listening", subStrand: "Listening for opinion", code: "3Lo.01", description: "Recognise, with support, the opinions of the speaker(s) in short talk." },
+        { stage: 3, strand: "Speaking", subStrand: "Communication", code: "3Sc.01", description: "Give basic information about themselves using sentences." },
+        { stage: 3, strand: "Speaking", subStrand: "Communication", code: "3Sc.02", description: "Describe people, places and objects, and routine actions and events, using sentences." },
+        { stage: 3, strand: "Speaking", subStrand: "Communication", code: "3Sc.03", description: "Ask questions to find out general information on a limited range of topics and respond accordingly." },
+        { stage: 3, strand: "Speaking", subStrand: "Communication", code: "3Sc.04", description: "Give, with support, short, simple instructions." },
+        { stage: 3, strand: "Speaking", subStrand: "Communication", code: "3Sc.05", description: "Pronounce familiar words and phrases so that these can generally be understood by others." },
+        { stage: 3, strand: "Speaking", subStrand: "Communication", code: "3Sc.06", description: "Produce sentences to maintain short exchanges, allowing for noticeable hesitation and false starts." },
+        { stage: 3, strand: "Speaking", subStrand: "Communication", code: "3Sc.07", description: "Use some simple grammatical structures and sentence patterns correctly, allowing for frequent, basic mistakes." },
+        { stage: 3, strand: "Speaking", subStrand: "Express opinion", code: "3So.01", description: "Express, with support, basic opinions and feelings." },
+        { stage: 3, strand: "Speaking", subStrand: "Organisation", code: "3Sor.01", description: "Link words and phrases using basic connectives." },
+        { stage: 3, strand: "Speaking", subStrand: "Organisation", code: "3Sor.02", description: "Initiate and maintain interaction, with support, in a limited range of short exchanges." },
+        { stage: 3, strand: "Writing", subStrand: "Communicative achievement", code: "3Wca.01", description: "Use legible handwriting in written work." },
+        { stage: 3, strand: "Writing", subStrand: "Communicative achievement", code: "3Wca.02", description: "Use upper and lower case letters accurately when writing names, places and short sentences when writing independently." },
+        { stage: 3, strand: "Writing", subStrand: "Communicative achievement", code: "3Wca.03", description: "Spell most simple, high-frequency words accurately during guided writing activities." },
+        { stage: 3, strand: "Writing", subStrand: "Communicative achievement", code: "3Wca.04", description: "Plan, write and check sentences, with support." },
+        { stage: 3, strand: "Writing", subStrand: "Communicative achievement", code: "3Wca.05", description: "Use some simple grammatical structures and sentence patterns correctly, allowing for frequent, basic mistakes." },
+        { stage: 3, strand: "Writing", subStrand: "Organisation", code: "3Wor.01", description: "Use basic punctuation (e.g. exclamation mark) with some accuracy during guided writing of sentences." },
+        { stage: 3, strand: "Writing", subStrand: "Organisation", code: "3Wor.02", description: "Link, with little or no support, words, phrases and short sentences using basic connectives." },
+        { stage: 3, strand: "Writing", subStrand: "Content", code: "3Wc.01", description: "Write, with support, short, simple instructions." },
+        { stage: 3, strand: "Writing", subStrand: "Content", code: "3Wc.02", description: "Write, with support, short sentences which describe people, places and objects, and routine actions and events." },
+        { stage: 3, strand: "Writing", subStrand: "Content", code: "3Wc.03", description: "Express, with support, basic opinions and feelings." },
+        { stage: 3, strand: "Reading", subStrand: "Reading for global meaning", code: "3Rm.01", description: "Understand, with little or no support, the main point of short, simple texts." },
+        { stage: 3, strand: "Reading", subStrand: "Reading for global meaning", code: "3Rm.02", description: "Read, with support, a limited range of short, simple fiction and non-fiction texts with confidence and enjoyment." },
+        { stage: 3, strand: "Reading", subStrand: "Reading for detail", code: "3Rd.01", description: "Understand, with support, most specific information and detail in short, simple texts." },
+        { stage: 3, strand: "Reading", subStrand: "Reading for detail", code: "3Rd.02", description: "Read and follow a short sequence of familiar instructions." },
+        { stage: 3, strand: "Reading", subStrand: "Reading for detail", code: "3Rd.03", description: "Deduce meaning from context, with support, in short, simple, illustrated texts." },
+        { stage: 3, strand: "Reading", subStrand: "Reading for opinion", code: "3Ro.01", description: "Recognise, with support, the opinions of the writer(s) in short, simple texts." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.01", description: "Use question words and structures to ask questions." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.02", description: "Use imperative forms [positive only] of common verbs for simple commands and instructions." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.03", description: "Use present simple forms to describe a limited range of routines, habits and states." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.04", description: "Use past simple regular and irregular forms to describe actions and narrate simple events." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.05", description: "Use present continuous forms to describe events and talk about present activities." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.06", description: "Begin to use present perfect forms [regular and irregular] of common verbs (e.g. have you [ever] been?) to talk about experiences." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.07", description: "Use shall [interrogative] to make suggestions and will to ask about future intention." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.08", description: "Use must to express obligation and could as a past form of can." },
+        { stage: 3, strand: "Use of English", subStrand: "Grammatical forms", code: "3Ug.09", description: "Use common adjectives and comparative and superlative adjectives to give personal information and opinions and describe things." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.01", description: "Use cardinal numbers 1–1000." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.02", description: "Use by and with to indicate agent and instrument and from [origin] and with/without [inclusion]." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.03", description: "Use prepositions of location, position and direction (e.g. above, below, inside, opposite, outside, under)." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.04", description: "Use prepositions of time (e.g. after, before) to state when things happen." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.05", description: "Use a range of adverbs of definite time." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.06", description: "Use common adverbs of frequency (e.g. never, a lot)." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.07", description: "Use common adverbs of sequence (e.g. first, next, then) and direction (e.g. left, right)." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.08", description: "Use adverbs of manner (e.g. slowly, quietly)." },
+        { stage: 3, strand: "Use of English", subStrand: "Vocabulary", code: "3Uv.09", description: "Use countable nouns as direct and indirect objects." },
+        { stage: 3, strand: "Use of English", subStrand: "Sentence structure", code: "3Us.01", description: "Use a limited range of quantifiers (e.g. no, some, any, many, much, a lot of) to refer to familiar objects." },
+        { stage: 3, strand: "Use of English", subStrand: "Sentence structure", code: "3Us.02", description: "Use common demonstrative pronouns to ask and answer simple questions." },
+        { stage: 3, strand: "Use of English", subStrand: "Sentence structure", code: "3Us.03", description: "Use direct and indirect personal pronouns in descriptions of events and actions." },
+        { stage: 3, strand: "Use of English", subStrand: "Sentence structure", code: "3Us.04", description: "Use connectives (e.g. because) to give reasons." },
+        { stage: 3, strand: "Use of English", subStrand: "Sentence structure", code: "3Us.05", description: "Use common verbs followed by infinitive (e.g. hope to do) and gerund forms (e.g. avoid doing)." },
+        { stage: 3, strand: "Use of English", subStrand: "Sentence structure", code: "3Us.06", description: "Begin to use infinitive of purpose." },
+        // Stage 4
+        { stage: 4, strand: "Listening", subStrand: "Listening for global meaning", code: "4Lm.01", description: "Understand, with support, most of the main points of short talk." },
+        { stage: 4, strand: "Listening", subStrand: "Listening for detail", code: "4Ld.01", description: "Understand, with support, a range of instructions." },
+        { stage: 4, strand: "Listening", subStrand: "Listening for detail", code: "4Ld.02", description: "Understand, with support, an increasing range of questions which ask for information." },
+        { stage: 4, strand: "Listening", subStrand: "Listening for detail", code: "4Ld.03", description: "Deduce meaning from context, with little or no support, in short talk." },
+        { stage: 4, strand: "Listening", subStrand: "Listening for detail", code: "4Ld.04", description: "Understand, with little or no support, most specific information and detail of short talk." },
+        { stage: 4, strand: "Listening", subStrand: "Listening for opinion", code: "4Lo.01", description: "Recognise, with little or no support, the opinions of the speaker(s) in short talk." },
+        { stage: 4, strand: "Speaking", subStrand: "Communication", code: "4Sc.01", description: "Give basic information about themselves and others using a short sequence of sentences." },
+        { stage: 4, strand: "Speaking", subStrand: "Communication", code: "4Sc.02", description: "Describe people, places and objects, and routine past and present actions and events, using a short sequence of sentences." },
+        { stage: 4, strand: "Speaking", subStrand: "Communication", code: "4Sc.03", description: "Ask questions to find out general information on an increasing range of topics and respond accordingly." },
+        { stage: 4, strand: "Speaking", subStrand: "Communication", code: "4Sc.04", description: "Give, with support, a short sequence of instructions." },
+        { stage: 4, strand: "Speaking", subStrand: "Communication", code: "4Sc.05", description: "Pronounce some familiar words and phrases clearly; others may need to ask for repetition from time to time." },
+        { stage: 4, strand: "Speaking", subStrand: "Communication", code: "4Sc.06", description: "Produce a short sequence of sentences to maintain short exchanges, allowing for some hesitation, false starts and reformulation." },
+        { stage: 4, strand: "Speaking", subStrand: "Communication", code: "4Sc.07", description: "Use some simple grammatical structures and sentence patterns correctly, allowing for some basic mistakes." },
+        { stage: 4, strand: "Speaking", subStrand: "Express opinion", code: "4So.01", description: "Express, with support, opinions and feelings." },
+        { stage: 4, strand: "Speaking", subStrand: "Organisation", code: "4Sor.01", description: "Link, with support, a short sequence of simple sentences using a limited range of connectives." },
+        { stage: 4, strand: "Speaking", subStrand: "Organisation", code: "4Sor.02", description: "Initiate, maintain and conclude interaction, with some support, in an increasing range of exchanges." },
+        { stage: 4, strand: "Writing", subStrand: "Communicative achievement", code: "4Wca.01", description: "Use legible handwriting in written work with some speed and fluency." },
+        { stage: 4, strand: "Writing", subStrand: "Communicative achievement", code: "4Wca.02", description: "Spell most high-frequency words accurately when writing independently." },
+        { stage: 4, strand: "Writing", subStrand: "Communicative achievement", code: "4Wca.03", description: "Plan, write, edit and proofread a short sequence of sentences in a paragraph, with support." },
+        { stage: 4, strand: "Writing", subStrand: "Communicative achievement", code: "4Wca.04", description: "Use some simple grammatical structures and sentence patterns correctly, allowing for some mistakes." },
+        { stage: 4, strand: "Writing", subStrand: "Organisation", code: "4Wor.01", description: "Punctuate a sequence of sentences in a paragraph during guided writing with some accuracy." },
+        { stage: 4, strand: "Writing", subStrand: "Organisation", code: "4Wor.02", description: "Link, with support, a short sequence of simple sentences using a limited range of connectives to create a paragraph." },
+        { stage: 4, strand: "Writing", subStrand: "Organisation", code: "4Wor.03", description: "Use, with support, appropriate layout for a limited range of written genres." },
+        { stage: 4, strand: "Writing", subStrand: "Content", code: "4Wc.01", description: "Write, with support, a short sequence of instructions." },
+        { stage: 4, strand: "Writing", subStrand: "Content", code: "4Wc.02", description: "Write, with support, a short sequence of simple sentences which describe people, places and objects, and routine past and present actions and events." },
+        { stage: 4, strand: "Writing", subStrand: "Content", code: "4Wc.03", description: "Express, with support, opinions and feelings." },
+        { stage: 4, strand: "Reading", subStrand: "Reading for global meaning", code: "4Rm.01", description: "Understand, with support, some of the main points of short, simple texts." },
+        { stage: 4, strand: "Reading", subStrand: "Reading for global meaning", code: "4Rm.02", description: "Read, with support, an increasing range of short, simple fiction and non-fiction texts with confidence and enjoyment." },
+        { stage: 4, strand: "Reading", subStrand: "Reading for detail", code: "4Rd.01", description: "Understand, with little or no support, most specific information and detail in short, simple texts." },
+        { stage: 4, strand: "Reading", subStrand: "Reading for detail", code: "4Rd.02", description: "Read and follow an increasing range of instructions." },
+        { stage: 4, strand: "Reading", subStrand: "Reading for detail", code: "4Rd.03", description: "Deduce meaning from context, with little or no support, in short, simple texts." },
+        { stage: 4, strand: "Reading", subStrand: "Reading for detail", code: "4Rd.04", description: "Explore words with common roots and derivations, including links to words in their first language." },
+        { stage: 4, strand: "Reading", subStrand: "Reading for opinion", code: "4Ro.01", description: "Recognise, with little or no support, the opinions of the writer(s) in short, simple texts." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.01", description: "Begin to use tag questions to seek agreement or clarify." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.02", description: "Use would you like + noun to offer and would you like + verb to invite and use appropriate responses to invitations, yes please, no thank you." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.03", description: "Use imperative forms [positive and negative] of an increasing range of verbs to give a short sequence of commands and instructions." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.04", description: "Use present simple regular and irregular forms to describe routines, habits and states." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.05", description: "Use past simple regular and irregular forms to describe routines, habits and states." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.06", description: "Use present continuous forms with future meaning." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.07", description: "Use past continuous forms for background actions." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.08", description: "Use present perfect forms of common verbs to express what has happened [indefinite time]." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.09", description: "Use future forms will for predictions and be going to to talk about already decided plans." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.10", description: "Use have [got] to/had to to express obligation and might, may, could to express possibility." },
+        { stage: 4, strand: "Use of English", subStrand: "Grammatical forms", code: "4Ug.11", description: "Use an increasing range of adjectives and comparative and superlative adjectives [regular and irregular]." },
+        { stage: 4, strand: "Use of English", subStrand: "Vocabulary", code: "4Uv.01", description: "Use like to describe things and about to denote topic." },
+        { stage: 4, strand: "Use of English", subStrand: "Vocabulary", code: "4Uv.02", description: "Use prepositions of direction (e.g. into, out, of, from, towards)." },
+        { stage: 4, strand: "Use of English", subStrand: "Vocabulary", code: "4Uv.03", description: "Use adverbs of indefinite time (e.g. yet, ever, already, always)." },
+        { stage: 4, strand: "Use of English", subStrand: "Vocabulary", code: "4Uv.04", description: "Use comparative and superlative forms of common adverbs." },
+        { stage: 4, strand: "Use of English", subStrand: "Vocabulary", code: "4Uv.05", description: "Use an increasing range of countable and uncountable nouns." },
+        { stage: 4, strand: "Use of English", subStrand: "Sentence structure", code: "4Us.01", description: "Use an increasing range of quantifiers (e.g. each, every, a few, few, a little, little)." },
+        { stage: 4, strand: "Use of English", subStrand: "Sentence structure", code: "4Us.02", description: "Use a limited range of indefinite pronouns (e.g. some, any, something, nothing, anything)." },
+        { stage: 4, strand: "Use of English", subStrand: "Sentence structure", code: "4Us.03", description: "Use connectives (e.g. when, before, after, then) to link parts of sentences." },
+        { stage: 4, strand: "Use of English", subStrand: "Sentence structure", code: "4Us.04", description: "Use defining relative clauses with which, who, that, where to give personal information." },
+        { stage: 4, strand: "Use of English", subStrand: "Sentence structure", code: "4Us.05", description: "Use when/before/after subordinate clauses to describe simple present and past actions." },
+        { stage: 4, strand: "Use of English", subStrand: "Sentence structure", code: "4Us.06", description: "Use an increasing range of verbs followed by infinitive and gerund forms." },
+        { stage: 4, strand: "Use of English", subStrand: "Sentence structure", code: "4Us.07", description: "Use infinitive of purpose." },
+        // Stage 5
+        { stage: 5, strand: "Listening", subStrand: "Listening for global meaning", code: "5Lm.01", description: "Understand, with little or no support, most of the main points of short talk." },
+        { stage: 5, strand: "Listening", subStrand: "Listening for detail", code: "5Ld.01", description: "Understand, with little or no support, a range of instructions." },
+        { stage: 5, strand: "Listening", subStrand: "Listening for detail", code: "5Ld.02", description: "Understand a range of questions which ask for information." },
+        { stage: 5, strand: "Listening", subStrand: "Listening for detail", code: "5Ld.03", description: "Deduce meaning from context in short talk." },
+        { stage: 5, strand: "Listening", subStrand: "Listening for detail", code: "5Ld.04", description: "Understand specific information and detail of short talk." },
+        { stage: 5, strand: "Listening", subStrand: "Listening for opinion", code: "5Lo.01", description: "Recognise the opinions of the speaker(s) in short talk." },
+        { stage: 5, strand: "Speaking", subStrand: "Communication", code: "5Sc.01", description: "Give more detailed information about themselves and others using a sequence of sentences." },
+        { stage: 5, strand: "Speaking", subStrand: "Communication", code: "5Sc.02", description: "Describe people, places and objects, and routine past and present actions and events, using a sequence of sentences." },
+        { stage: 5, strand: "Speaking", subStrand: "Communication", code: "5Sc.03", description: "Ask questions to find out general information on a range of topics and respond accordingly." },
+        { stage: 5, strand: "Speaking", subStrand: "Communication", code: "5Sc.04", description: "Give, with little or no support, a short sequence of instructions." },
+        { stage: 5, strand: "Speaking", subStrand: "Communication", code: "5Sc.05", description: "Pronounce familiar words and phrases clearly; others may need to ask for repetition from time to time." },
+        { stage: 5, strand: "Speaking", subStrand: "Communication", code: "5Sc.06", description: "Produce a sequence of sentences to maintain a range of exchanges, allowing for some hesitation, false starts and reformulation." },
+        { stage: 5, strand: "Speaking", subStrand: "Communication", code: "5Sc.07", description: "Use simple grammatical structures and sentence patterns correctly, allowing for occasional, basic mistakes." },
+        { stage: 5, strand: "Speaking", subStrand: "Express opinion", code: "5So.01", description: "Express, with little or no support, opinions and feelings." },
+        { stage: 5, strand: "Speaking", subStrand: "Organisation", code: "5Sor.01", description: "Link, with little or no support, a short sequence of simple sentences using an increasing range of connectives." },
+        { stage: 5, strand: "Speaking", subStrand: "Organisation", code: "5Sor.02", description: "Initiate, maintain and conclude interaction, with little or no support, in a range of exchanges." },
+        { stage: 5, strand: "Writing", subStrand: "Communicative achievement", code: "5Wca.01", description: "Use legible handwriting in written work with increasing speed and fluency." },
+        { stage: 5, strand: "Writing", subStrand: "Communicative achievement", code: "5Wca.02", description: "Spell high-frequency words accurately on an increasing range of familiar topics when writing independently." },
+        { stage: 5, strand: "Writing", subStrand: "Communicative achievement", code: "5Wca.03", description: "Plan, write, edit and proofread short texts, with support." },
+        { stage: 5, strand: "Writing", subStrand: "Communicative achievement", code: "5Wca.04", description: "Use simple grammatical structures and sentence patterns correctly, allowing for occasional mistakes." },
+        { stage: 5, strand: "Writing", subStrand: "Organisation", code: "5Wor.01", description: "Punctuate short texts during guided writing with some accuracy." },
+        { stage: 5, strand: "Writing", subStrand: "Organisation", code: "5Wor.02", description: "Link, with little or no support, a short sequence of sentences using an increasing range of connectives to create a short text organised into paragraphs." },
+        { stage: 5, strand: "Writing", subStrand: "Organisation", code: "5Wor.03", description: "Use, with little or no support, appropriate layout for a limited range of written genres." },
+        { stage: 5, strand: "Writing", subStrand: "Content", code: "5Wc.01", description: "Write, with little or no support, a short sequence of instructions." },
+        { stage: 5, strand: "Writing", subStrand: "Content", code: "5Wc.02", description: "Write, with little or no support, a short sequence of simple sentences which describe people, places and objects, and routine past and present actions and events." },
+        { stage: 5, strand: "Writing", subStrand: "Content", code: "5Wc.03", description: "Express, with little or no support, opinions and feelings." },
+        { stage: 5, strand: "Reading", subStrand: "Reading for global meaning", code: "5Rm.01", description: "Understand, with little or no support, most of the main points of short texts." },
+        { stage: 5, strand: "Reading", subStrand: "Reading for global meaning", code: "5Rm.02", description: "Read, with little or no support, a range of short, simple fiction and non-fiction texts with confidence and enjoyment." },
+        { stage: 5, strand: "Reading", subStrand: "Reading for detail", code: "5Rd.01", description: "Understand most specific information and detail in short texts." },
+        { stage: 5, strand: "Reading", subStrand: "Reading for detail", code: "5Rd.02", description: "Read and follow a range of instructions." },
+        { stage: 5, strand: "Reading", subStrand: "Reading for detail", code: "5Rd.03", description: "Deduce meaning from context in short texts." },
+        { stage: 5, strand: "Reading", subStrand: "Reading for detail", code: "5Rd.04", description: "Identify and explore words with common roots and compare their meanings." },
+        { stage: 5, strand: "Reading", subStrand: "Reading for opinion", code: "5Ro.01", description: "Recognise the opinions of the writer(s) in short texts." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.01", description: "Use tag questions to seek agreement or clarify." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.02", description: "Use imperative forms with direct and indirect object forms to give a short sequence of commands and instructions." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.03", description: "Use an increasing range of present simple forms to describe routines, habits and states." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.04", description: "Use an increasing range of past simple forms to describe routines, habits and states." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.05", description: "Use present continuous forms with present and future meaning." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.06", description: "Use past continuous forms for background and interrupted past actions." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.07", description: "Use present perfect forms to express what has happened [indefinite time and unfinished past] with for and since." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.08", description: "Use an increasing range of future forms, including present continuous and present simple with future meaning." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.09", description: "Begin to use if clauses in zero conditionals." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.10", description: "Use modal forms (e.g. mustn't [prohibition], need [necessity], would, could [polite requests])." },
+        { stage: 5, strand: "Use of English", subStrand: "Grammatical forms", code: "5Ug.11", description: "Use a range of adjectives, including common participle adjectives (e.g. bored/boring) and comparative and superlative adjectives in the correct order in front of nouns." },
+        { stage: 5, strand: "Use of English", subStrand: "Vocabulary", code: "5Uv.01", description: "Begin to use common dependent prepositions following adjectives (e.g. good at)." },
+        { stage: 5, strand: "Use of English", subStrand: "Vocabulary", code: "5Uv.02", description: "Use a limited range of prepositions preceding nouns." },
+        { stage: 5, strand: "Use of English", subStrand: "Vocabulary", code: "5Uv.03", description: "Use a range of prepositions to talk about time, location, position and direction." },
+        { stage: 5, strand: "Use of English", subStrand: "Vocabulary", code: "5Uv.04", description: "Use a range of adverbs of indefinite time (e.g. for, since)." },
+        { stage: 5, strand: "Use of English", subStrand: "Vocabulary", code: "5Uv.05", description: "Use comparative and superlative forms with a range of adverbs." },
+        { stage: 5, strand: "Use of English", subStrand: "Vocabulary", code: "5Uv.06", description: "Use adverbs of degree (e.g. too, not enough, quite, rather)." },
+        { stage: 5, strand: "Use of English", subStrand: "Vocabulary", code: "5Uv.07", description: "Use common abstract nouns and compound nouns." },
+        { stage: 5, strand: "Use of English", subStrand: "Vocabulary", code: "5Uv.08", description: "Use common impersonal structures with it, there." },
+        { stage: 5, strand: "Use of English", subStrand: "Sentence structure", code: "5Us.01", description: "Use a range of quantifiers (e.g. both, all, less, fewer, not as many, not as much)." },
+        { stage: 5, strand: "Use of English", subStrand: "Sentence structure", code: "5Us.02", description: "Use an increasing range of indefinite pronouns (e.g. someone, somebody, everybody, no-one)." },
+        { stage: 5, strand: "Use of English", subStrand: "Sentence structure", code: "5Us.03", description: "Use connectives (e.g. so, when) in short texts." },
+        { stage: 5, strand: "Use of English", subStrand: "Sentence structure", code: "5Us.04", description: "Use an increasing range of defining relative clauses to give personal information and details." },
+        { stage: 5, strand: "Use of English", subStrand: "Sentence structure", code: "5Us.05", description: "Use subordinate clauses following sure, certain, think, know, believe, hope." },
+        { stage: 5, strand: "Use of English", subStrand: "Sentence structure", code: "5Us.06", description: "Use a range of verbs followed by infinitive and gerund forms." },
+        // Stage 6
+        { stage: 6, strand: "Listening", subStrand: "Listening for global meaning", code: "6Lm.01", description: "Understand, with support, most of the main points of short and extended talk." },
+        { stage: 6, strand: "Listening", subStrand: "Listening for detail", code: "6Ld.01", description: "Understand a range of instructions." },
+        { stage: 6, strand: "Listening", subStrand: "Listening for detail", code: "6Ld.02", description: "Understand a range of questions which ask for detailed information." },
+        { stage: 6, strand: "Listening", subStrand: "Listening for detail", code: "6Ld.03", description: "Deduce meaning from context, with support, in short and extended talk." },
+        { stage: 6, strand: "Listening", subStrand: "Listening for detail", code: "6Ld.04", description: "Understand, with support, most specific information and detail of short and extended talk." },
+        { stage: 6, strand: "Listening", subStrand: "Listening for detail", code: "6Ld.05", description: "Understand, with support, most of the detail of an argument in short and extended talk." },
+        { stage: 6, strand: "Listening", subStrand: "Listening for opinion", code: "6Lo.01", description: "Recognise, with support, the opinions of the speaker(s) in short and extended talk." },
+        { stage: 6, strand: "Speaking", subStrand: "Communication", code: "6Sc.01", description: "Give detailed information about themselves and others." },
+        { stage: 6, strand: "Speaking", subStrand: "Communication", code: "6Sc.02", description: "Describe people, places and objects, and routine past and present actions and events." },
+        { stage: 6, strand: "Speaking", subStrand: "Communication", code: "6Sc.03", description: "Ask questions to find out information and to clarify meaning on a range of topics and respond accordingly." },
+        { stage: 6, strand: "Speaking", subStrand: "Communication", code: "6Sc.04", description: "Give a sequence of instructions." },
+        { stage: 6, strand: "Speaking", subStrand: "Communication", code: "6Sc.05", description: "Pronounce familiar words and phrases clearly; begin to use intonation and place stress at word, phrase and sentence level appropriately." },
+        { stage: 6, strand: "Speaking", subStrand: "Communication", code: "6Sc.06", description: "Begin to produce and maintain stretches of language comprehensibly, allowing for hesitation and reformulation, especially in longer stretches of free production." },
+        { stage: 6, strand: "Speaking", subStrand: "Communication", code: "6Sc.07", description: "Use grammatical structures correctly, allowing for occasional mistakes." },
+        { stage: 6, strand: "Speaking", subStrand: "Express opinion", code: "6So.01", description: "Express opinions, feelings and reactions." },
+        { stage: 6, strand: "Speaking", subStrand: "Organisation", code: "6Sor.01", description: "Link sentences using an increasing range of connectives." },
+        { stage: 6, strand: "Speaking", subStrand: "Organisation", code: "6Sor.02", description: "Briefly summarise what others say, with support, in a range of exchanges in order to achieve a shared outcome." },
+        { stage: 6, strand: "Writing", subStrand: "Communicative achievement", code: "6Wca.01", description: "Use legible handwriting in written work with appropriate speed and fluency." },
+        { stage: 6, strand: "Writing", subStrand: "Communicative achievement", code: "6Wca.02", description: "Spell most familiar words accurately on a range of familiar topics when writing independently." },
+        { stage: 6, strand: "Writing", subStrand: "Communicative achievement", code: "6Wca.03", description: "Plan, write, edit and proofread short texts, with little or no support." },
+        { stage: 6, strand: "Writing", subStrand: "Communicative achievement", code: "6Wca.04", description: "Use grammatical structures correctly, allowing for occasional mistakes." },
+        { stage: 6, strand: "Writing", subStrand: "Organisation", code: "6Wor.01", description: "Punctuate short texts with some accuracy when writing independently." },
+        { stage: 6, strand: "Writing", subStrand: "Organisation", code: "6Wor.02", description: "Link sentences using an increasing range of connectives to create a short text organised into paragraphs." },
+        { stage: 6, strand: "Writing", subStrand: "Organisation", code: "6Wor.03", description: "Use appropriate layout for a limited range of written genres." },
+        { stage: 6, strand: "Writing", subStrand: "Content", code: "6Wc.01", description: "Write a sequence of instructions." },
+        { stage: 6, strand: "Writing", subStrand: "Content", code: "6Wc.02", description: "Write, with support, short texts which describe people, places and objects, and routine past and present actions and events." },
+        { stage: 6, strand: "Writing", subStrand: "Content", code: "6Wc.03", description: "Express opinions and feelings." },
+        { stage: 6, strand: "Reading", subStrand: "Reading for global meaning", code: "6Rm.01", description: "Understand, with support, most of the main points of short and extended texts." },
+        { stage: 6, strand: "Reading", subStrand: "Reading for global meaning", code: "6Rm.02", description: "Read independently a range of short, simple fiction and non-fiction texts with confidence and enjoyment." },
+        { stage: 6, strand: "Reading", subStrand: "Reading for detail", code: "6Rd.01", description: "Understand, with support, most specific information and detail in short and extended texts." },
+        { stage: 6, strand: "Reading", subStrand: "Reading for detail", code: "6Rd.02", description: "Read and follow instructions." },
+        { stage: 6, strand: "Reading", subStrand: "Reading for detail", code: "6Rd.03", description: "Understand, with support, most of the detail of an argument in short and extended texts." },
+        { stage: 6, strand: "Reading", subStrand: "Reading for detail", code: "6Rd.04", description: "Deduce meaning from context, with support, in short and extended texts." },
+        { stage: 6, strand: "Reading", subStrand: "Reading for detail", code: "6Rd.05", description: "Explore common idiomatic phrases and their meanings." },
+        { stage: 6, strand: "Reading", subStrand: "Reading for opinion", code: "6Ro.01", description: "Recognise, with support, the opinions of the writer(s) in short and extended texts." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.01", description: "Use a limited range of verb forms to ask questions to develop ideas and extend understanding." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.02", description: "Use what/how about + noun/-ing to make suggestions." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.03", description: "Use a range of present simple active forms and begin to use passive forms." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.04", description: "Use a range of past simple active forms for habits and states and begin to use passive forms." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.05", description: "Use an increasing range of present continuous forms with present and future meaning." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.06", description: "Use past continuous forms for background, parallel and interrupted past actions." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.07", description: "Use present perfect forms to express recent, indefinite and unfinished past." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.08", description: "Use a range of future forms, including present continuous and present simple with future meaning." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.09", description: "Begin to use if clauses in first conditionals." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.10", description: "Use common prepositional verbs (e.g. walk away)." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.11", description: "Begin to use simple forms of reported speech to report statements and commands." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.12", description: "Use an increasing range of modal forms (e.g. needn't [lack of necessity], should [advice], ought to [advice/obligation])." },
+        { stage: 6, strand: "Use of English", subStrand: "Grammatical forms", code: "6Ug.13", description: "Use an increasing range of participle adjectives and a range of adjectives in the correct order in front of nouns." },
+        { stage: 6, strand: "Use of English", subStrand: "Vocabulary", code: "6Uv.01", description: "Use common dependent prepositions following adjectives." },
+        { stage: 6, strand: "Use of English", subStrand: "Vocabulary", code: "6Uv.02", description: "Use an increasing range of prepositions preceding nouns." },
+        { stage: 6, strand: "Use of English", subStrand: "Vocabulary", code: "6Uv.03", description: "Use prepositions (e.g. as, like) to indicate manner." },
+        { stage: 6, strand: "Use of English", subStrand: "Vocabulary", code: "6Uv.04", description: "Use a wide range of adverbs of definite and indefinite time." },
+        { stage: 6, strand: "Use of English", subStrand: "Vocabulary", code: "6Uv.05", description: "Use comparative and superlative forms with regular and irregular adverbs." },
+        { stage: 6, strand: "Use of English", subStrand: "Vocabulary", code: "6Uv.06", description: "Use collective nouns." },
+        { stage: 6, strand: "Use of English", subStrand: "Vocabulary", code: "6Uv.07", description: "Use a limited range of abstract nouns and compound nouns." },
+        { stage: 6, strand: "Use of English", subStrand: "Sentence structure", code: "6Us.01", description: "Use a wide range of quantifiers (e.g. either, neither, both [of], several, plenty)." },
+        { stage: 6, strand: "Use of English", subStrand: "Sentence structure", code: "6Us.02", description: "Use reciprocal pronouns (each other, one another) and a range of indefinite pronouns." },
+        { stage: 6, strand: "Use of English", subStrand: "Sentence structure", code: "6Us.03", description: "Use reflexive pronouns." },
+        { stage: 6, strand: "Use of English", subStrand: "Sentence structure", code: "6Us.04", description: "Use connectives (e.g. while, until, as soon as) in short texts." },
+        { stage: 6, strand: "Use of English", subStrand: "Sentence structure", code: "6Us.05", description: "Use an increasing range of defining relative clauses (e.g. with whose and whom) and begin to use non-defining relative clauses." },
+        { stage: 6, strand: "Use of English", subStrand: "Sentence structure", code: "6Us.06", description: "Use subordinate clauses following say and tell." },
+        { stage: 6, strand: "Use of English", subStrand: "Sentence structure", code: "6Us.07", description: "Use the patterns verb + object + infinitive (e.g. have something to do) and give/take/send/bring/show + direct/indirect object." }
+    ];
+
+    // --- APPLICATION LOGIC ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const stageFilter = document.getElementById('stage-filter');
+        const strandFilter = document.getElementById('strand-filter');
+        const searchBox = document.getElementById('search-box');
+        const clearButton = document.getElementById('clear-button');
+        const resultsContainer = document.getElementById('results-container');
+
+        const renderObjectives = () => {
+            const selectedStage = stageFilter.value;
+            const selectedStrand = strandFilter.value;
+            const searchTerm = searchBox.value.toLowerCase().trim();
+
+            // If no filters are applied, show the initial prompt and exit.
+            if (selectedStage === 'all' && selectedStrand === 'all' && searchTerm === '') {
+                resultsContainer.innerHTML = '<p id="initial-prompt">Please use the filters or search box above to find learning objectives.</p>';
+                return;
+            }
+
+            // 1. Filter the objectives based on selections
+            const filteredObjectives = objectives.filter(obj => {
+                const stageMatch = selectedStage === 'all' || obj.stage == selectedStage;
+                const strandMatch = selectedStrand === 'all' || obj.strand === selectedStrand;
+                const searchMatch = !searchTerm || 
+                                    obj.description.toLowerCase().includes(searchTerm) ||
+                                    obj.code.toLowerCase().includes(searchTerm);
+                return stageMatch && strandMatch && searchMatch;
+            });
+
+            // 2. Group the filtered results for better display
+            const groupedResults = filteredObjectives.reduce((acc, obj) => {
+                const groupKey = `Stage ${obj.stage} - ${obj.strand}: ${obj.subStrand}`;
+                if (!acc[groupKey]) {
+                    acc[groupKey] = [];
+                }
+                acc[groupKey].push(obj);
+                return acc;
+            }, {});
+
+            // 3. Render the HTML
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            if (Object.keys(groupedResults).length === 0) {
+                resultsContainer.innerHTML = '<p id="no-results">No learning objectives match your criteria.</p>';
+                return;
+            }
+            
+            const sortedGroupKeys = Object.keys(groupedResults).sort();
+
+            for (const groupName of sortedGroupKeys) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'objective-group';
+
+                const title = document.createElement('h2');
+                title.textContent = groupName;
+                groupDiv.appendChild(title);
+
+                const list = document.createElement('ul');
+                list.className = 'objective-list';
+
+                groupedResults[groupName].forEach(obj => {
+                    const listItem = document.createElement('li');
+                    
+                    const codeSpan = document.createElement('span');
+                    codeSpan.className = 'objective-code';
+                    codeSpan.textContent = obj.code;
+
+                    const descSpan = document.createElement('span');
+                    descSpan.className = 'objective-description';
+                    descSpan.textContent = obj.description;
+
+                    listItem.appendChild(codeSpan);
+                    listItem.appendChild(descSpan);
+                    list.appendChild(listItem);
+                });
+
+                groupDiv.appendChild(list);
+                resultsContainer.appendChild(groupDiv);
+            }
+        };
+
+        // Event Listeners
+        stageFilter.addEventListener('change', renderObjectives);
+        strandFilter.addEventListener('change', renderObjectives);
+        searchBox.addEventListener('input', renderObjectives);
+        clearButton.addEventListener('click', () => {
+            stageFilter.value = 'all';
+            strandFilter.value = 'all';
+            searchBox.value = '';
+            renderObjectives(); // This will reset the view to the initial prompt
+        });
+
+        // Initial render on page load
+        renderObjectives();
+    });
+    </script>
+
+</body>
+</html>
